@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu
     steps:
       - uses: actions/checkout@v3
-      - id: Test Image build
+      - id: Test_Image_build
         run: |
           docker build -t 9873907098/clientapp -f ./client/Dockerfile.dev
           docker run -e CI=true 9873907098/clientapp npm run test
-      - id: Docker image Creation
+      - id: Docker_image_Creation
         run: |
           echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
           echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -22,7 +22,7 @@ jobs:
           docker build -t 9873907098/multi-nginx -f ./nginx/Dockerfile
           docker build -t 9873907098/multi-server -f ./server/Dockerfile
           docker build -t 9873907098/multi-worker -f ./worker/Dockerfile
-      - id: Push the images to docker hub
+      - id: Push_the_images_to_docker_hub
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker push 9873907098/multi-client
