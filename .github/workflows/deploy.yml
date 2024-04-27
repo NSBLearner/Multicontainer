@@ -3,7 +3,7 @@ run-name: ${{github.actor}} is deploying a production grade app deployment
 on: 
   push:
     branches:
-      - 'master'
+      - 'feature'
 jobs:
   test_build:
     runs-on: ubuntu
