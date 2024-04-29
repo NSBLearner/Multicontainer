@@ -36,6 +36,6 @@ jobs:
       run: aws s3 cp deploye.zip s3://elasticbeanstalk-eu-west-1-682426607174/
 
     - name: Create new ElasticBeanstalk Application Version & Deploy
-      run: | 
-      aws elasticbeanstalk create-application-version --application-name multi-docker --source-bundle S3Bucket="elasticbeanstalk-eu-west-1-682426607174",S3Key="deploy.zip" --version-label "ver-${{ github.sha }}" --description "commit-sha-${{ github.sha }}"
-      aws elasticbeanstalk update-environment --environment-name Multi-docker-env-1 --version-label "ver-${{ github.sha }}"
+      run: aws elasticbeanstalk create-application-version --application-name multi-docker --source-bundle S3Bucket="elasticbeanstalk-eu-west-1-682426607174",S3Key="deploy.zip" --version-label "ver-${{ github.sha }}" --description "commit-sha-${{ github.sha }}"
+    - name: Ceploy the latest Application version
+      run: aws elasticbeanstalk update-environment --environment-name Multi-docker-env-1 --version-label "ver-${{ github.sha }}"
