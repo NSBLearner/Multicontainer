@@ -33,7 +33,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
         aws-region: "eu-west-1"
     - name: Upload package to s3 bucket
-      run: aws s3 cp deploye.zip s3://elasticbeanstalk-eu-west-1-682426607174/
+      run: aws s3 cp deploy.zip s3://elasticbeanstalk-eu-west-1-682426607174/
 
     - name: Create new ElasticBeanstalk Application Version & Deploy
       run: aws elasticbeanstalk create-application-version --application-name multi-docker --source-bundle S3Bucket="elasticbeanstalk-eu-west-1-682426607174",S3Key="deploy.zip" --version-label "ver-${{ github.sha }}" --description "commit-sha-${{ github.sha }}"
