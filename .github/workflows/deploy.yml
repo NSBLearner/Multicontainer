@@ -2,7 +2,7 @@ name: Deploy MultiDocker
 on:
   push:
     branches:
-      - master # check your repo, your default branch might be master!
+      - test # check your repo, your default branch might be master!
 
 jobs:
   build:
@@ -38,4 +38,4 @@ jobs:
 #      - name: Create new ElasticBeanstalk Application Version & Deploy
 #        run: | 
 #          aws elasticbeanstalk create-application-version --application-name multi-docker --source-bundle S3Bucket="elasticbeanstalk-eu-west-1-682426607174",S3Key="deploy.zip" --version-label "ver-${{ github.sha }}" --description "commit-sha-${{ github.sha }}"
-#          aws elasticbeanstalk update-environment --environment-name Multi-docker-env-1 --version-label "ver-${{ github.sha }}"
+#NSBLearner
