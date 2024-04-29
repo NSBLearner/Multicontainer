@@ -1,32 +1,41 @@
-name: MultiContainer app Deployment
-run-name: ${{github.actor}} is deploying a production grade app deployment
-on: 
+name: Deploy MultiDocker
+on:
   push:
     branches:
-      - 'master'
+      - master # check your repo, your default branch might be master!
+
 jobs:
-  test_build:
-    runs-on: ubuntu
+  build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - id: Test_Image_build
-        run: |
-          docker build -t 9873907098/clientapp -f ./client/Dockerfile.dev
-          docker run -e CI=true 9873907098/clientapp npm run test
-      - id: Docker_image_Creation
-        run: |
-          echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-          echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-          echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-          docker build -t 9873907098/multi-client -f ./client/Dockerfile
-          docker build -t 9873907098/multi-nginx -f ./nginx/Dockerfile
-          docker build -t 9873907098/multi-server -f ./server/Dockerfile
-          docker build -t 9873907098/multi-worker -f ./worker/Dockerfile
-      - id: Push_the_images_to_docker_hub
-        run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push 9873907098/multi-client
-          docker push 9873907098/multi-nginx
-          docker push 9873907098/multi-server
-          docker push 9873907098/multi-worker
-        
+      - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - run: docker build -t 9873907098/react-test -f ./client/Dockerfile.dev ./client
+      - run: docker run -e CI=true 9873907098/react-test npm test
+
+      - run: docker build -t 9873907098/multi-client ./client
+      - run: docker build -t 9873907098/multi-nginx ./nginx
+      - run: docker build -t 9873907098/multi-server ./server
+      - run: docker build -t 9873907098/multi-worker ./worker
+
+      - run: docker push 9873907098/multi-client
+      - run: docker push 9873907098/multi-nginx
+      - run: docker push 9873907098/multi-server
+      - run: docker push 9873907098/multi-worker
+
+      -name: Generate
+       run: zip -r deploy.zip . -x "*.git*'"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+          aws-region: "eu-west-1"
+      - name: Upload package to s3 bucket
+        run: aws s3 cp deploye.zip s3://elasticbeanstalk-eu-west-1-682426607174/
+
+      - name: Create new ElasticBeanstalk Application Version & Deploy
+        run: | 
+          aws elasticbeanstalk create-application-version --application-name multi-docker --source-bundle S3Bucket="elasticbeanstalk-eu-west-1-682426607174",S3Key="deploy.zip" --version-label "ver-${{ github.sha }}" --description "commit-sha-${{ github.sha }}"
+          aws elasticbeanstalk update-environment --environment-name Multi-docker-env-1 --version-label "ver-${{ github.sha }}"
